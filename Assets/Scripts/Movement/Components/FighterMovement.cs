@@ -14,6 +14,7 @@ namespace Movement.Components
     {
         public float speed = 1.0f;
         public float jumpAmount = 1.0f;
+        public int hp = 100;
 
         private Rigidbody2D _rigidbody2D;
         private Animator _animator;
@@ -204,6 +205,15 @@ namespace Movement.Components
         public void TakeHitServerRpc()
         {
             _networkAnimator.SetTrigger(AnimatorHit);
+            if (hp > 0)
+            {
+                hp -= 10;
+            }
+            else
+            {
+                hp = 0;
+                Die();
+            }
         }
 
         public void Die()

@@ -73,7 +73,8 @@ public class GameMultiplayer : NetworkBehaviour
         playerDataNetworkList.Add(new PlayerData { 
             clientId = clientId, 
             characterIdFromList = 0, //por defecto todos son el primero character
-            playerLifeBar = 100,
+            hp = 100,
+            playerName = $"Player{playerDataNetworkList.Count}",
             
         });
         //Debug.Log($"Añadiendo jugador {clientId} a la partida");
@@ -134,6 +135,16 @@ public class GameMultiplayer : NetworkBehaviour
         return -1;
     }
     */
+    public List<PlayerData> PlayersDataToList()
+    {
+        List<PlayerData> list = new List<PlayerData>();
+        foreach(PlayerData playerData in playerDataNetworkList)
+        {
+            list.Add(playerData);
+        }
+        return list;
+    }
+
     public PlayerData GetPlayerDataFromPlayerIndex(int playerIndex)
     {
         //Devolvemos jugador de la lista q ocupa esa pos
