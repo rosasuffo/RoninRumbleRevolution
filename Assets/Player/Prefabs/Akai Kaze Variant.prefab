@@ -1,0 +1,108 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &1214867717902918559
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1279163059010513264, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+      propertyPath: m_Constraints
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1279163059010513268, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+      propertyPath: m_SpriteSortPoint
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1279163059010513268, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
+    - target: {fileID: 1279163059010513271, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1279163059010513271, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1279163059010513271, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1279163059010513271, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1279163059010513271, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1279163059010513271, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1279163059010513271, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1279163059010513271, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1279163059010513271, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1279163059010513271, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1279163059010513271, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1279163059010513274, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+      propertyPath: m_Name
+      value: Akai Kaze Variant
+      objectReference: {fileID: 0}
+    - target: {fileID: 2234863143392348708, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2234863143392348708, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3775030259296547742, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5052676979328557421, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6444215616322588684, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 938376207
+      objectReference: {fileID: 0}
+    - target: {fileID: 9203764117156224918, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9203764117156224918, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9203764117156224918, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 616946748170831130, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+    - {fileID: 3893237887465170019, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+    - {fileID: 761274972219322879, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+    - {fileID: 1279163059010513265, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+    - {fileID: 6444215616322588684, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
+  m_SourcePrefab: {fileID: 100100000, guid: d263bf678e21bea42b448ff5227410c2, type: 3}
