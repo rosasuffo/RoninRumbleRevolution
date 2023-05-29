@@ -11,7 +11,7 @@ namespace Fighting
         public Animator effectsPrefab;
         private static readonly int Hit03 = Animator.StringToHash("hit03");
 
-        [SerializeField] private int Damage;
+        //[SerializeField] private int Damage;
 
         private void OnCollisionEnter2D(Collision2D collision)
         {
@@ -39,10 +39,12 @@ namespace Fighting
         public void TakeDamageFromCollisionServerRpc(PlayerData playerData, ServerRpcParams serverRpcParams = default)
         {
             Debug.Log(playerData.clientId + ": Auch");
-            
-            Debug.Log("Initial life: " +playerData.playerLifeBar);
-            playerData.playerLifeBar -= Damage;
-            Debug.Log("Life after damage: " + playerData.playerLifeBar);
+            GameObject prefb = GameMultiplayer.Instance.GetCharacterPrefabFromPlayerDataIndex(playerData.clientId);
+            FighterMovement fighterMov = prefb.GetComponent<FighterMovement>();
+            Debug.Log("Initial life: " + fighterMov.hp);
+            fighterMov.TakeHit();
+            Debug.Log("Life after damage: " + fighterMov.hp);
+
 
         }
     }

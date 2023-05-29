@@ -69,12 +69,12 @@ public class GameMultiplayer : NetworkBehaviour
     private void NetworkManager_OnClientConnectedCallback(ulong clientId)
     {
         Debug.Log($"Añadiendo jugador {clientId} a la partida");
+        int id = playerDataNetworkList.Count + 1;
         //Cuando el cliente se conecta creamos nuevo PlayerData para guardar su info
         playerDataNetworkList.Add(new PlayerData { 
             clientId = clientId, 
             characterIdFromList = 0, //por defecto todos son el primero character
-            hp = 100,
-            playerName = $"Player{playerDataNetworkList.Count}",
+            playerName = $"Player{id}",
             
         });
         //Debug.Log($"Añadiendo jugador {clientId} a la partida");
