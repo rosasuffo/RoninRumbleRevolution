@@ -45,12 +45,12 @@ namespace Fighting
         [ServerRpc(RequireOwnership = false)]
         public void TakeDamageFromCollisionServerRpc(PlayerData playerData, ServerRpcParams serverRpcParams = default)
         {
-            Debug.Log(playerData.clientId + ": Auch");
+            //Debug.Log(playerData.clientId + ": Auch");
             
-            Debug.Log("Initial life: " + playerData.playerLife);
+            Debug.Log(playerData.clientId + "Initial life: " + playerData.playerLife);
             playerData.TakeHit(Damage);
             GameMultiplayer.Instance.UpdatePlayerDataServerRpc(playerData);
-            Debug.Log("Life after damage: " + playerData.playerLife);
+            Debug.Log(playerData.clientId + "Life after damage: " + playerData.playerLife);
 
         }
     }

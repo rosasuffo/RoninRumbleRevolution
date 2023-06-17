@@ -39,7 +39,7 @@ namespace UISystem.Managers
         }
 
         [SerializeField] private GameObject playerPrefab;
-        //[SerializeField] private Slider publicLifeBar;
+        //[SerializeField] private Canvas _canvasLifebar;
         //[SerializeField] private CinemachineVirtualCamera virtualCamera;
 
 
@@ -69,14 +69,14 @@ namespace UISystem.Managers
             //PlayerNetworkConfig.LocalInstance.OnAnyPlayerSpawned += Player_OnNewPlayer;
             //OnStartGame?.Invoke(this, EventArgs.Empty);
             //NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
+
+            //PlayerData.Instance.OnPlayerLifeToZero += PlayerData_OnPlayerLifeToZero;
         }
 
         public override void OnNetworkSpawn()
         {
             state.OnValueChanged += State_OnValueChanged;
             //isOnePlayerPaused.OnValueChanged += IsOnePlayerPaused_OnValueChanged;
-
-            
 
             if (IsServer)
             {
@@ -101,7 +101,11 @@ namespace UISystem.Managers
             OnStateChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        
+        private void PlayerData_OnPlayerLifeToZero(object sender, EventArgs e)
+        {
+            //Eliminar jugador
+            //Debug.Log($"El jugador {sender.")
+        }
 
         /*
         private void IsGamePaused_OnValueChange(bool previousValue, bool newValue)
@@ -116,12 +120,15 @@ namespace UISystem.Managers
             }
         }*/
 
+
         private void SceneManager_OnLoadEventCompleted(string sceneName, LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
         {
             foreach(ulong id in NetworkManager.Singleton.ConnectedClientsIds)
             {
+                if(id == 0) continue;
                 //SetPlayerReady();
                 InstantiatePlayerServerRpc(id);
+                //InstantiatePrivateLifebarClientRpc(id);
             }
         }
 
@@ -132,10 +139,30 @@ namespace UISystem.Managers
             playerGameObject.GetComponent<NetworkObject>().SpawnWithOwnership(clientId);
             playerGameObject.transform.SetParent(transform, false);
 
+            //Canvas privateLifebar = Instantiate(_privateLifebar);
+            //privateLifebar.GetComponent<NetworkObject>().SpawnWithOwnership(clientId);
+            //privateLifebar.transform.SetParent(transform, false);
+
+            //InstantiatePrivateLifebarClientRpc(clientId);
+
             Debug.Log("Carga juego completada: nuevo player en la partida");
         }
+        /*
+        [ClientRpc]
+        public void InstantiatePrivateLifebarClientRpc(ulong clientId)
+        {
+            Canvas privateLifebar = Instantiate(_canvasLifebar);
+            privateLifebar.GetComponent<NetworkObject>().SpawnWithOwnership(clientId);
+            privateLifebar.transform.SetParent(transform, false);
+        }
 
-
+        public void UpdatePrivateLifebar(ulong clientId)
+        {
+            Slider privateLifebar = _canvasLifebar.GetComponentInChildren<Slider>();
+            PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFromClientId(clientId);
+            Debug.Log($"Actualizando barra jugador {clientId}: {privateLifebar.value} --> {playerData.playerLife}");
+            privateLifebar.value = playerData.playerLife;
+        }*/
 
 
         /*
@@ -298,8 +325,7 @@ namespace UISystem.Managers
                     }
                     break;
                 case State.GamePlaying:
-                    Debug.Log("GamePlaying");
-                    Debug.Log(timer.Value);
+                    //Debug.Log("GamePlaying");
                     timer.Value -= Time.deltaTime;
                     if (timer.Value < 0f) state.Value = State.GameOver;
                     break;
