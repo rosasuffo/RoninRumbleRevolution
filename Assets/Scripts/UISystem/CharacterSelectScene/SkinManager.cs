@@ -2,8 +2,10 @@ using Netcode;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UISystem.Managers;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace UISystem.CharacterSelectScene
@@ -55,8 +57,12 @@ namespace UISystem.CharacterSelectScene
 
         private void Start()
         {
+
             GameMultiplayer.Instance.OnPlayerDataListChanged += GameManager_OnPlayerDataListChanged;
+  
             JoinGameReady.Instance.OnPlayerReady += JoinGameReady_OnPlayerChanged;
+
+            JoinGameReady.Instance.OnAllPlayersReady += JoinGameReady_OnAllPlayersReady;
 
             //JoinGameReady.Instance.OnNextCharacter += JoinGameReady_OnNextCharacter;
             //JoinGameReady.Instance.OnPreviousCharacter += JoinGameReady_OnPreviousCharacter;
@@ -72,6 +78,11 @@ namespace UISystem.CharacterSelectScene
         private void JoinGameReady_OnPlayerChanged(object sender, EventArgs e)
         {
             UpdatePlayer();
+        }
+
+        private void JoinGameReady_OnAllPlayersReady(object sender, EventArgs e)
+        {
+            GameMultiplayer.Instance.OnPlayerDataListChanged -= GameManager_OnPlayerDataListChanged;
         }
 
         /*

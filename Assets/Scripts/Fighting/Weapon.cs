@@ -1,4 +1,5 @@
 using Movement.Components;
+using Netcode;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -11,27 +12,33 @@ namespace Fighting
         public Animator effectsPrefab;
         private static readonly int Hit03 = Animator.StringToHash("hit03");
 
-        //[SerializeField] private int Damage;
+        [SerializeField] private int Damage;
 
         private void OnCollisionEnter2D(Collision2D collision)
         {
             GameObject otherObject = collision.gameObject;
             // Debug.Log($"Sword collision with {otherObject.name}");
 
-            //Encontrar a que personaje esta dando
-            PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFromGameObjectCharacter(otherObject);
-            //PlayerData playerData = otherObject.GetComponent<PlayerData>();
-            Debug.Log($"El Jugador {NetworkManager.Singleton.LocalClientId} ha dado al jugador {playerData.clientId}");
-            TakeDamageFromCollisionServerRpc(playerData);
-
             Animator effect = Instantiate(effectsPrefab);
             effect.transform.position = collision.GetContact(0).point;
             effect.SetTrigger(Hit03);
 
+            
             // TODO: Review if this is the best way to do this
             IFighterReceiver enemy = otherObject.GetComponent<IFighterReceiver>();
+            PlayerData playerData;
             if (enemy != null)
+            {
                 enemy.TakeHit();
+
+                //Buscamos al cliente que recibe el daño
+                NetworkObject networkObject = collision.gameObject.GetComponent<NetworkObject>();
+                playerData = GameMultiplayer.Instance.GetPlayerDataFromClientId(networkObject.OwnerClientId);
+
+                //PlayerData playerData = otherObject.GetComponent<PlayerData>();
+                Debug.Log($"El Jugador {OwnerClientId} ha dado al jugador {playerData.clientId}");
+                TakeDamageFromCollisionServerRpc(playerData);
+            }    
 
             //OnCollisionEnter2DServerRpc(collision);
         }
@@ -39,12 +46,11 @@ namespace Fighting
         public void TakeDamageFromCollisionServerRpc(PlayerData playerData, ServerRpcParams serverRpcParams = default)
         {
             Debug.Log(playerData.clientId + ": Auch");
-            GameObject prefb = GameMultiplayer.Instance.GetCharacterPrefabFromPlayerDataIndex(playerData.clientId);
-            FighterMovement fighterMov = prefb.GetComponent<FighterMovement>();
-            Debug.Log("Initial life: " + fighterMov.hp);
-            fighterMov.TakeHit();
-            Debug.Log("Life after damage: " + fighterMov.hp);
-
+            
+            Debug.Log("Initial life: " + playerData.playerLife);
+            playerData.TakeHit(Damage);
+            GameMultiplayer.Instance.UpdatePlayerDataServerRpc(playerData);
+            Debug.Log("Life after damage: " + playerData.playerLife);
 
         }
     }

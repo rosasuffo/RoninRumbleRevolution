@@ -13,6 +13,7 @@ namespace UISystem.CharacterSelectScene
         public static JoinGameReady Instance { get; private set; }
 
         public event EventHandler OnPlayerReady;
+        public event EventHandler OnAllPlayersReady;
 
         private Dictionary<ulong, bool> playersReadyDictionary;
 
@@ -59,6 +60,7 @@ namespace UISystem.CharacterSelectScene
             if (allClientsReady)
             {
                 SceneLoader.LoadNetwork(SceneLoader.Scene.GameScene);
+                OnAllPlayersReady?.Invoke(this, EventArgs.Empty);
             }
         }
 

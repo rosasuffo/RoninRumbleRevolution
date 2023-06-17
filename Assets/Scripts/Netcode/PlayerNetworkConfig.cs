@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 using InputSystems;
 using UISystem.Managers;
+using UnityEngine.UI;
 
 namespace Netcode
 {
@@ -23,9 +24,10 @@ namespace Netcode
 
 
         public static PlayerNetworkConfig LocalInstance { get; private set; }
-        
+
 
         //public GameObject characterPrefab;
+        //[SerializeField] private GameObject Lifebar;
         //[SerializeField] private List<Vector3> spawnPositionList;
 
         private void Awake()
@@ -49,6 +51,8 @@ namespace Netcode
 
             //transform.position = Vector3.zero;
             //transform.position = spawnPositionList[(int)GameMultiplayer.Instance.GetPlayerDataIndexFromClientId(OwnerClientId)];
+            
+            
         }
 
         [ServerRpc]

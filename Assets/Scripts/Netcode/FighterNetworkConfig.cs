@@ -7,6 +7,7 @@ using System.Diagnostics;
 using UnityEngine;
 using Unity.Netcode.Components;
 using UISystem.Managers;
+using UnityEngine.UI;
 
 namespace Netcode
 {
@@ -14,6 +15,8 @@ namespace Netcode
     {
 
         public static FighterNetworkConfig LocalInstance { get; private set; }
+
+        //[SerializeField] private GameObject publicLifebar;
 
 
         public override void OnNetworkSpawn()
@@ -29,16 +32,17 @@ namespace Netcode
             ICinemachineCamera virtualCamera = CinemachineCore.Instance.GetActiveBrain(0).ActiveVirtualCamera;
             virtualCamera.Follow = transform;
 
-            
+            //InstantiateLifeBarPlayerServerRpc(OwnerClientId);
         }
 
+        /*
         [ServerRpc]
-        public void InstantiateFighterServerRpc(ulong id)
+        public void InstantiateLifeBarPlayerServerRpc(ulong clientId)
         {
-            Transform fighter = Instantiate(LocalInstance.transform);
-            fighter.GetComponent<NetworkObject>().SpawnWithOwnership(id);
-            fighter.transform.SetParent(transform, false);
-        }
+            GameObject lifeBar = Instantiate(GameManager.Instance.GetSliderPrefabForLifebar().gameObject);
+            lifeBar.GetComponent<NetworkObject>().SpawnWithOwnership(clientId);
+            lifeBar.transform.SetParent(transform, true);
+        }*/
 
 
 

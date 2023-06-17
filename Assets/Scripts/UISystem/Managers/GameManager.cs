@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Cinemachine;
 using Netcode;
+using UnityEngine.UI;
 
 namespace UISystem.Managers
 {
@@ -28,13 +29,17 @@ namespace UISystem.Managers
         public event EventHandler OnPlayerUnpaused;
         //public event EventHandler OnPlayerExitGame;
 
+        public event EventHandler OnOnePlayerRest;
+
         private enum State
         {
             CountdownToStart,
             GamePlaying,
+            GameOver,
         }
 
         [SerializeField] private GameObject playerPrefab;
+        //[SerializeField] private Slider publicLifeBar;
         //[SerializeField] private CinemachineVirtualCamera virtualCamera;
 
 
@@ -46,6 +51,9 @@ namespace UISystem.Managers
 
         private NetworkVariable<float> countdownToStartTimer = new NetworkVariable<float>(3f);
         private Dictionary<ulong, bool> playersReadyDictionary;
+
+        private NetworkVariable<float> timer = new NetworkVariable<float>(0f);
+        private float timerMaxDuration = 3f * 60f;
         //private Dictionary<ulong, bool> playersPausedDictionary;
 
         private void Awake()
@@ -60,6 +68,7 @@ namespace UISystem.Managers
         {
             //PlayerNetworkConfig.LocalInstance.OnAnyPlayerSpawned += Player_OnNewPlayer;
             //OnStartGame?.Invoke(this, EventArgs.Empty);
+            //NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
         }
 
         public override void OnNetworkSpawn()
@@ -67,12 +76,15 @@ namespace UISystem.Managers
             state.OnValueChanged += State_OnValueChanged;
             //isOnePlayerPaused.OnValueChanged += IsOnePlayerPaused_OnValueChanged;
 
+            
 
             if (IsServer)
             {
                 //InstantiatePlayerServerRpc(OwnerClientId);
                 NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += SceneManager_OnLoadEventCompleted;
-                //NetworkManager.Singleton.OnClientDisconnectedCallback += GameManager_OnClientDisconnectedCallback;
+                //NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
+                
+
             }
 
             
@@ -88,6 +100,8 @@ namespace UISystem.Managers
         {
             OnStateChanged?.Invoke(this, EventArgs.Empty);
         }
+
+        
 
         /*
         private void IsGamePaused_OnValueChange(bool previousValue, bool newValue)
@@ -121,42 +135,44 @@ namespace UISystem.Managers
             Debug.Log("Carga juego completada: nuevo player en la partida");
         }
 
-        
-/*
-        public void SetPlayerReady()
-        {
-            if (state.Value == State.WaitingToStart)
-            {
-                isPlayerReady = true;
 
-                SetPlayerReadyServerRpc();
 
-                OnPlayerReady?.Invoke(this, EventArgs.Empty);
-            }
-        }
 
-        [ServerRpc(RequireOwnership = false)]
-        private void SetPlayerReadyServerRpc(ServerRpcParams serverRpcParams = default)
-        {
-            playersReadyDictionary[serverRpcParams.Receive.SenderClientId] = true;
-            Debug.Log(serverRpcParams.Receive.SenderClientId);
-
-            bool allClientsReady = true;
-            foreach(ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
-            {
-                if(!playersReadyDictionary.ContainsKey(clientId) || !playersReadyDictionary[clientId]) 
+        /*
+                public void SetPlayerReady()
                 {
-                    allClientsReady = false;
-                    break;
-                }
-            }
-            Debug.Log("All clients ready: " + allClientsReady);
+                    if (state.Value == State.WaitingToStart)
+                    {
+                        isPlayerReady = true;
 
-            if (allClientsReady)
-            {
-                state.Value = State.CountdownToStart;
-            }
-        }*/
+                        SetPlayerReadyServerRpc();
+
+                        OnPlayerReady?.Invoke(this, EventArgs.Empty);
+                    }
+                }
+
+                [ServerRpc(RequireOwnership = false)]
+                private void SetPlayerReadyServerRpc(ServerRpcParams serverRpcParams = default)
+                {
+                    playersReadyDictionary[serverRpcParams.Receive.SenderClientId] = true;
+                    Debug.Log(serverRpcParams.Receive.SenderClientId);
+
+                    bool allClientsReady = true;
+                    foreach(ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
+                    {
+                        if(!playersReadyDictionary.ContainsKey(clientId) || !playersReadyDictionary[clientId]) 
+                        {
+                            allClientsReady = false;
+                            break;
+                        }
+                    }
+                    Debug.Log("All clients ready: " + allClientsReady);
+
+                    if (allClientsReady)
+                    {
+                        state.Value = State.CountdownToStart;
+                    }
+                }*/
 
         //Getters y setters
         public bool IsCountdownToStartActive()
@@ -178,9 +194,19 @@ namespace UISystem.Managers
         public bool IsGamePlaying()
         {
             return state.Value == State.GamePlaying;
+        }  
+        
+        public float GetTimer()
+        {
+            return 1 * Mathf.RoundToInt(timer.Value);
         }
 
-        
+        public bool IsGameOver()
+        {
+            return state.Value == State.GameOver;
+        }
+
+
         public void PauseGame()
         {
             isPlayerPaused = !isPlayerPaused; //se establece el estado contrario
@@ -194,6 +220,11 @@ namespace UISystem.Managers
                 OnPlayerUnpaused?.Invoke(this, EventArgs.Empty); 
             }
         }
+        /*
+        public void ExitGame()
+        {
+            SceneLoader.Load(SceneLoader.Scene.MainScene);
+        }*/
         /*
         public void ExitGame()
         {
@@ -263,11 +294,25 @@ namespace UISystem.Managers
                         //Time.timeScale = 1f;
                         CountDownFinishedServerRpc(); //avisar a los clientes
                         state.Value = State.GamePlaying;
+                        timer.Value = timerMaxDuration;
                     }
                     break;
                 case State.GamePlaying:
-
+                    Debug.Log("GamePlaying");
+                    Debug.Log(timer.Value);
+                    timer.Value -= Time.deltaTime;
+                    if (timer.Value < 0f) state.Value = State.GameOver;
                     break;
+                case State.GameOver:
+                    break;
+            }
+
+            
+            //Comprobar numero de jugadores
+            if(NetworkManager.Singleton.ConnectedClients.Count == 1)
+            {
+                Debug.Log($"Todos los jugadores se han desconectado. Enhorabuena {NetworkManager.Singleton.ConnectedClientsIds[0]} has ganado");
+                OnOnePlayerRest?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -282,6 +327,12 @@ namespace UISystem.Managers
         {
             OnFinishedCountdown?.Invoke(this, EventArgs.Empty);
         }
+
+        /*
+        public Slider GetSliderPrefabForLifebar()
+        {
+            return publicLifeBar;
+        }*/
 
         /*
         public override void OnNetworkDespawn()
