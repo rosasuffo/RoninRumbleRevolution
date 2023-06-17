@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TMPro;
 using UISystem.Managers;
 using Unity.Netcode;
 using UnityEngine;
@@ -14,7 +15,8 @@ namespace Assets.Scripts.UISystem.GameSceneUI
     {
         [SerializeField] private Button pauseButton;
         [SerializeField] private Button resumeButton;
-        //[SerializeField] private Button exitButton;
+        [SerializeField] private Button exitButton;
+
 
         private void Awake()
         {
@@ -34,11 +36,11 @@ namespace Assets.Scripts.UISystem.GameSceneUI
                 pauseButton.enabled = true;
             });
 
-            /*
             exitButton.onClick.AddListener(() =>
             {
-                GameManager.Instance.ExitGame();
-            });*/
+                NetworkManager.Singleton.Shutdown();
+                SceneLoader.Load(SceneLoader.Scene.MainMenu);
+            });
         }
 
         private void Start()
@@ -47,9 +49,17 @@ namespace Assets.Scripts.UISystem.GameSceneUI
             //Si hay un jugador pausado debemos mostrar la UI y ocultarla cuando salen
             GameManager.Instance.OnPlayerPaused += GameManager_OnPlayerPaused;
             GameManager.Instance.OnPlayerUnpaused += GameManager_OnPlayerUnpaused;
-            NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
 
             Hide();
+        }
+
+        private void Update()
+        {
+            //float minutes = Mathf.FloorToInt(GameManager.Instance.GetTimer() / 60);
+            //float seconds = Mathf.FloorToInt(GameManager.Instance.GetTimer() % 60);
+            //
+            //string currentTime = string.Format("{00:00}{01:00}", minutes, seconds);
+            //timer.text = currentTime.ToString();
         }
 
         private void Show()
@@ -75,11 +85,6 @@ namespace Assets.Scripts.UISystem.GameSceneUI
         private void GameManager_OnPlayerUnpaused(object sender, System.EventArgs e)
         {
             Hide();
-        }
-
-        private void NetworkManager_OnClientDisconnectCallback(ulong clientId)
-        {
-            Debug.Log($"El jugador {clientId} ha abandonado la partida");
         }
     }
 }

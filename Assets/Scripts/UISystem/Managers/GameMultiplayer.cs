@@ -1,8 +1,12 @@
+using Movement.Components;
+using Netcode;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UISystem.Managers;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -43,6 +47,7 @@ public class GameMultiplayer : NetworkBehaviour
     {
         NetworkManager.Singleton.ConnectionApprovalCallback += NetworkManager_ConnectionApprovalCallback;
         NetworkManager.Singleton.OnClientConnectedCallback += NetworkManager_OnClientConnectedCallback;
+        NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
         NetworkManager.Singleton.StartHost();
         Debug.Log("Host creado");
     }
@@ -73,10 +78,15 @@ public class GameMultiplayer : NetworkBehaviour
         playerDataNetworkList.Add(new PlayerData { 
             clientId = clientId, 
             characterIdFromList = 0, //por defecto todos son el primero character
-            playerLifeBar = 100,
+            playerLife = 100,
             
         });
         //Debug.Log($"Añadiendo jugador {clientId} a la partida");
+    }
+    private void NetworkManager_OnClientDisconnectCallback(ulong clientId)
+    {
+        Debug.Log($"El jugador {clientId} se ha desconectado.");
+        //UpdateClients();
     }
 
     //Para el prefab de character select, saber si para el id, existe un jugador
@@ -154,12 +164,12 @@ public class GameMultiplayer : NetworkBehaviour
         return default;
     }
 
-    public PlayerData GetPlayerDataFromGameObjectCharacter(GameObject fighter)
+    public PlayerData GetPlayerDataFromGameObject(GameObject fighter)
     {
         int playerIndex = -1;
         for(int i = 0; i < characterPrefabs.Count; i++)
         {
-            if (characterPrefabs[i] == fighter.transform) playerIndex = i;
+            if (characterPrefabs[i] == fighter) playerIndex = i;
         }
 
         if (playerIndex > -1) return GetPlayerDataFromPlayerIndex(playerIndex);
@@ -198,6 +208,15 @@ public class GameMultiplayer : NetworkBehaviour
         playerDataNetworkList[playerDataIndex] = playerData;
     }
 
+    [ServerRpc(RequireOwnership = false)]
+    public void UpdatePlayerDataServerRpc(PlayerData auxData)
+    {
+        int playerIndex = GetPlayerIndexFromClientId(auxData.clientId);
+        PlayerData playerData = playerDataNetworkList[playerIndex];
+        playerData = auxData;
+        playerDataNetworkList[playerIndex] = playerData;
+    }
+
     /*
     [ClientRpc]
     private void ChangePlayerCharacterClientRpc(ulong clientId)
@@ -213,6 +232,11 @@ public class GameMultiplayer : NetworkBehaviour
     public int GetCharacterListCount()
     {
         return characterPrefabs.Count;
+    }
+
+    public Scene ShowActiveScene()
+    {
+        return SceneManager.GetActiveScene();
     }
 
 }

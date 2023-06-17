@@ -4,6 +4,8 @@ using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
+using UISystem.GameSceneUI;
 
 namespace Movement.Components
 {
@@ -20,6 +22,7 @@ namespace Movement.Components
         private NetworkAnimator _networkAnimator;
         private Transform _feet;
         private LayerMask _floor;
+        private Slider _lifebar;
 
         private Vector3 _direction = Vector3.zero;
         private bool _grounded = true;
@@ -48,6 +51,7 @@ namespace Movement.Components
             _rigidbody2D = GetComponent<Rigidbody2D>();
             _animator = GetComponent<Animator>();
             _networkAnimator = GetComponent<NetworkAnimator>();
+            _lifebar = GetComponentInChildren<Canvas>().GetComponentInChildren<Slider>();
 
             _feet = transform.Find("Feet");
             _floor = LayerMask.GetMask("Floor");
@@ -200,20 +204,31 @@ namespace Movement.Components
         {
             TakeHitServerRpc();
         }
+
         [ServerRpc(RequireOwnership = false)]
         public void TakeHitServerRpc()
         {
             _networkAnimator.SetTrigger(AnimatorHit);
+            //_lifebar.value -= 5;
+            UpdateLifebarClientRpc();
         }
 
         public void Die()
         {
             DieServerRpc();
         }
+
         [ServerRpc(RequireOwnership = false)]
         public void DieServerRpc()
         {
             _networkAnimator.SetTrigger(AnimatorDie);
+        }
+        
+        [ClientRpc]
+        private void UpdateLifebarClientRpc()
+        {
+            PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFromClientId(OwnerClientId);
+            _lifebar.value = playerData.playerLife;
         }
 
 

@@ -1,4 +1,5 @@
 using Movement.Components;
+using Netcode;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -18,20 +19,26 @@ namespace Fighting
             GameObject otherObject = collision.gameObject;
             // Debug.Log($"Sword collision with {otherObject.name}");
 
-            //Encontrar a que personaje esta dando
-            PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFromGameObjectCharacter(otherObject);
-            //PlayerData playerData = otherObject.GetComponent<PlayerData>();
-            Debug.Log($"El Jugador {NetworkManager.Singleton.LocalClientId} ha dado al jugador {playerData.clientId}");
-            TakeDamageFromCollisionServerRpc(playerData);
-
             Animator effect = Instantiate(effectsPrefab);
             effect.transform.position = collision.GetContact(0).point;
             effect.SetTrigger(Hit03);
 
+            
             // TODO: Review if this is the best way to do this
             IFighterReceiver enemy = otherObject.GetComponent<IFighterReceiver>();
+            PlayerData playerData;
             if (enemy != null)
+            {
                 enemy.TakeHit();
+
+                //Buscamos al cliente que recibe el daño
+                NetworkObject networkObject = collision.gameObject.GetComponent<NetworkObject>();
+                playerData = GameMultiplayer.Instance.GetPlayerDataFromClientId(networkObject.OwnerClientId);
+
+                //PlayerData playerData = otherObject.GetComponent<PlayerData>();
+                Debug.Log($"El Jugador {OwnerClientId} ha dado al jugador {playerData.clientId}");
+                TakeDamageFromCollisionServerRpc(playerData);
+            }    
 
             //OnCollisionEnter2DServerRpc(collision);
         }
@@ -40,9 +47,10 @@ namespace Fighting
         {
             Debug.Log(playerData.clientId + ": Auch");
             
-            Debug.Log("Initial life: " +playerData.playerLifeBar);
-            playerData.playerLifeBar -= Damage;
-            Debug.Log("Life after damage: " + playerData.playerLifeBar);
+            Debug.Log("Initial life: " + playerData.playerLife);
+            playerData.TakeHit(Damage);
+            GameMultiplayer.Instance.UpdatePlayerDataServerRpc(playerData);
+            Debug.Log("Life after damage: " + playerData.playerLife);
 
         }
     }
