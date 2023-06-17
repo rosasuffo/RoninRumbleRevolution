@@ -31,7 +31,7 @@ public class GameMultiplayer : NetworkBehaviour
     private const string PLAYER_PREFS_MULTIPLAYER = "PlayerMultiplayer";
 
     private NetworkList<PlayerData> playerDataNetworkList;
-    private NetworkList<FixedString64Bytes> playersNamesNetworkList;
+    //private NetworkList<FixedString64Bytes> playersNamesNetworkList;
     private string playerName_config;
     //private readonly System.Object xLock = new System.Object(); 
 
@@ -48,7 +48,7 @@ public class GameMultiplayer : NetworkBehaviour
         DontDestroyOnLoad(gameObject);
 
         playerName_config = "Player "+ UnityEngine.Random.Range(100, 10000).ToString();
-        playersNamesNetworkList = new NetworkList<FixedString64Bytes>();
+        //playersNamesNetworkList = new NetworkList<FixedString64Bytes>();
 
         playerDataNetworkList = new NetworkList<PlayerData>();
         playerDataNetworkList.OnListChanged += PlayerDataNetworkList_OnListChanged;
@@ -80,11 +80,15 @@ public class GameMultiplayer : NetworkBehaviour
         
         //GameManager.Instance.OnStartInteractAction();
         //OnJoiningGame?.Invoke(this, EventArgs.Empty);
-        //NetworkManager.Singleton.OnClientConnectedCallback += NetworkManager_Client_OnClientConnectedCallback;
+        NetworkManager.Singleton.OnClientConnectedCallback += NetworkManager_Client_OnClientConnectedCallback;
         NetworkManager.Singleton.StartClient();
         Debug.Log("Cliente nuevo conectado");
     }
 
+    private void NetworkManager_Client_OnClientConnectedCallback(ulong clientId)
+    {
+        SetPlayerNameServerRpc(GetPlayerName());
+    }
 
     private void NetworkManager_ConnectionApprovalCallback(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse connectionApprovalResponse)
     {        
@@ -99,24 +103,16 @@ public class GameMultiplayer : NetworkBehaviour
 
     private void NetworkManager_Server_OnClientConnectedCallback(ulong clientId)
     {
-        playersNamesNetworkList.Add(new FixedString64Bytes("Player " + UnityEngine.Random.Range(100, 10000).ToString()));
-        UpdatePlayerNameServerRpc(clientId, GetPlayerName());
         if (clientId == 0) return;
-        Debug.Log($"Añadiendo jugador {clientId}, {playersNamesNetworkList[(int)clientId]} a la partida");
+        
         //Cuando el cliente se conecta creamos nuevo PlayerData para guardar su info
         playerDataNetworkList.Add(new PlayerData { 
             clientId = clientId, 
-            playerName = playersNamesNetworkList[(int)clientId],
             characterIdFromList = 0, //por defecto todos son el primero character
             playerLife = 100,
             
         });
-        Debug.Log($"{playerDataNetworkList.Count} on PlayersIds list: ");
-        foreach (var playerData in playerDataNetworkList)
-        {
-            Debug.Log($"{playerData.clientId}");
-        }
-        //Debug.Log($"Añadiendo jugador {clientId} a la partida");
+
     }
 
     /*
@@ -200,7 +196,7 @@ public class GameMultiplayer : NetworkBehaviour
 
 
 
-    //#region GESTION PLAYER DATA
+    #region GESTION PLAYER DATA
     public PlayerData GetPlayerDataFromPlayerIndex(int playerIndex)
     {
         //Devolvemos jugador de la lista q ocupa esa pos
@@ -254,14 +250,17 @@ public class GameMultiplayer : NetworkBehaviour
     {
         ChangePlayerCharacterServerRpc(character);
     }
-    //#endregion
+    #endregion
 
-    //#region SERVER FUNCTIONS
-    [ServerRpc]
-    public void UpdatePlayerNameServerRpc(ulong clientId, string playerName)
+    #region SERVER FUNCTIONS
+    [ServerRpc(RequireOwnership = false)]
+    public void SetPlayerNameServerRpc(string playerName, ServerRpcParams serverRpcParams = default)
     {
-        Debug.Log("Hola?!");
-        playersNamesNetworkList[(int)clientId] = playerName;
+        int playerDataIndex = GetPlayerIndexFromClientId(serverRpcParams.Receive.SenderClientId);
+        PlayerData playerData = playerDataNetworkList[playerDataIndex];
+        playerData.playerName = playerName;
+
+        playerDataNetworkList[playerDataIndex] = playerData;
     }
 
 
@@ -285,7 +284,7 @@ public class GameMultiplayer : NetworkBehaviour
 
         //OnPlayerUpdatePrivateLife?.Invoke(this, EventArgs.Empty);
     }
-    //#endregion
+    #endregion
 
     /*
     [ClientRpc]

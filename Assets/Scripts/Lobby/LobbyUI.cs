@@ -48,6 +48,7 @@ public class LobbyUI : MonoBehaviour
 
     private void Start()
     {
+        playerName_input.text = "Player " + UnityEngine.Random.Range(100, 10000).ToString();
         playerName_input.onValueChanged.AddListener((string newText) =>
         {
             GameMultiplayer.Instance.SetPlayerName(newText);
