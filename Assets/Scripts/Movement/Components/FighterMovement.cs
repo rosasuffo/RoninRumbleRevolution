@@ -6,6 +6,9 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 using UISystem.GameSceneUI;
+using System;
+using Unity.VisualScripting;
+using Netcode;
 
 namespace Movement.Components
 {
@@ -22,7 +25,8 @@ namespace Movement.Components
         private NetworkAnimator _networkAnimator;
         private Transform _feet;
         private LayerMask _floor;
-        private Slider _lifebar;
+        public Slider _publicLifebar;
+        //private Slider _privateLifebar;
 
         private Vector3 _direction = Vector3.zero;
         private bool _grounded = true;
@@ -51,7 +55,10 @@ namespace Movement.Components
             _rigidbody2D = GetComponent<Rigidbody2D>();
             _animator = GetComponent<Animator>();
             _networkAnimator = GetComponent<NetworkAnimator>();
-            _lifebar = GetComponentInChildren<Canvas>().GetComponentInChildren<Slider>();
+            //_privateLifebar = GetComponentInChildren<Canvas>(CompareTag("private")).GetComponentInChildren<Slider>();
+            _publicLifebar = GetComponentInChildren<Canvas>(CompareTag("public")).GetComponentInChildren<Slider>();
+            
+            //_privateLifebar = GetComponentInChildren<Canvas>().GetComponentInChildren<Slider>();
 
             _feet = transform.Find("Feet");
             _floor = LayerMask.GetMask("Floor");
@@ -63,8 +70,6 @@ namespace Movement.Components
             }
 
         }
-
-
 
         void Update()
         {
@@ -203,6 +208,9 @@ namespace Movement.Components
         public void TakeHit()
         {
             TakeHitServerRpc();
+            //HealthSystem.Instance.UpdatePrivateLifebar(OwnerClientId);
+            //UpdatePrivateLifebar();
+            
         }
 
         [ServerRpc(RequireOwnership = false)]
@@ -211,6 +219,9 @@ namespace Movement.Components
             _networkAnimator.SetTrigger(AnimatorHit);
             //_lifebar.value -= 5;
             UpdateLifebarClientRpc();
+            //UpdatePrivateLifebar();
+            //_privateLifebar.value = _publicLifebar.value;
+
         }
 
         public void Die()
@@ -228,8 +239,25 @@ namespace Movement.Components
         private void UpdateLifebarClientRpc()
         {
             PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFromClientId(OwnerClientId);
-            _lifebar.value = playerData.playerLife;
+            //if(playerData.playerLife <= 0)
+            //{
+            //    Die();
+            //}
+            _publicLifebar.value = playerData.playerLife;
+            //_privateLifebar.value = playerData.playerLife;
+
+            //GameManager.Instance.UpdatePrivateLifebarClient(playerData.playerLife);
+            //PlayerNetworkConfig.LocalInstance.UpdatePrivateLifebarClientRpc(playerData.playerLife);
+            //HealthSystem.Instance.UpdatePrivateLifebarClientRpc(playerData.playerLife);
         }
+
+        /*
+        private void UpdatePrivateLifebar()
+        {
+            PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFromClientId(OwnerClientId);
+            Debug.Log($"Actualizando barra jugador {OwnerClientId}: {_privateLifebar.value} --> {playerData.playerLife}");
+            _privateLifebar.value = playerData.playerLife;
+        }*/
 
 
         private void GameManager_OnPlayerPaused(object sender, System.EventArgs e)

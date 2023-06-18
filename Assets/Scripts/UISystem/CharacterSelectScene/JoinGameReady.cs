@@ -24,6 +24,8 @@ namespace UISystem.CharacterSelectScene
             Instance = this;
 
             playersReadyDictionary = new Dictionary<ulong, bool>();
+            //El server lo ponemos como ready
+            playersReadyDictionary[0] = true;
         }
 
         public void Start()
@@ -57,7 +59,7 @@ namespace UISystem.CharacterSelectScene
             }
             Debug.Log("All clients ready: " + allClientsReady);
 
-            if (allClientsReady)
+            if (allClientsReady && playersReadyDictionary.Count > 1)
             {
                 SceneLoader.LoadNetwork(SceneLoader.Scene.GameScene);
                 OnAllPlayersReady?.Invoke(this, EventArgs.Empty);

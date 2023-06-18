@@ -812,11 +812,11 @@ PlayerSettings:
     m_VersionName: 
   apiCompatibilityLevel: 6
   activeInputHandler: 1
-  cloudProjectId: 
+  cloudProjectId: 76e49e00-0bbf-4f25-9651-5003e5640e83
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: 
-  organizationId: 
+  projectName: Practica
+  organizationId: rosasuffo
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   playerDataPath: 

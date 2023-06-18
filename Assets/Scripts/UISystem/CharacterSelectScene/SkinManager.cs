@@ -2,6 +2,7 @@ using Netcode;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UISystem.Managers;
 using Unity.Netcode;
 using UnityEngine;
@@ -18,6 +19,10 @@ namespace UISystem.CharacterSelectScene
         [SerializeField] private Button nextButton;
         [SerializeField] private Button previousButton;
         [SerializeField] private Button readyButton;
+        [SerializeField] private TextMeshProUGUI playerName;
+        //[SerializeField] private TextMeshProUGUI lobbyName;
+        //[SerializeField] private TextMeshProUGUI lobbyCode;
+
 
         [SerializeField] private int playerIndex; //para identificar los prefabs de la escena
         [SerializeField] private GameObject readyGameObject; //para señalizar al resto q el jugador esta ready
@@ -26,6 +31,7 @@ namespace UISystem.CharacterSelectScene
 
         private void Awake()
         {
+            if (NetworkManager.Singleton.IsServer) return;
             foreach (GameObject skin in characterSkinsPrefabs)
             {
                 skin.SetActive(false);
@@ -59,15 +65,20 @@ namespace UISystem.CharacterSelectScene
         {
 
             GameMultiplayer.Instance.OnPlayerDataListChanged += GameManager_OnPlayerDataListChanged;
-  
             JoinGameReady.Instance.OnPlayerReady += JoinGameReady_OnPlayerChanged;
-
             JoinGameReady.Instance.OnAllPlayersReady += JoinGameReady_OnAllPlayersReady;
+
+            //GameMultiplayer.Instance.UpdatePlayerName(playerIndex);
+            //playerName.text = playerData.playerName.ToString();
 
             //JoinGameReady.Instance.OnNextCharacter += JoinGameReady_OnNextCharacter;
             //JoinGameReady.Instance.OnPreviousCharacter += JoinGameReady_OnPreviousCharacter;
 
             UpdatePlayer();
+
+            //Lobby lobby = GameLobby.Instance.GetLobby();
+            //lobbyName.text = "Lobby Name: " + lobby.Name;
+            //lobbyCode.text = "Lobby Code: " + lobby.LobbyCode;
         }
 
         private void GameManager_OnPlayerDataListChanged(object sender, EventArgs e)
@@ -130,7 +141,8 @@ namespace UISystem.CharacterSelectScene
                 PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFromPlayerIndex(playerIndex);
                 gameObject.SetActive(true);
 
-                //Si esta ready aparece el mensaje
+                Debug.Log(playerData.playerName.ToString());
+                playerName.text = playerData.playerName.ToString();
                 
                 //Si player esta ready se activa el mensaje
                 readyGameObject.SetActive(JoinGameReady.Instance.IsPlayerReady(playerData.clientId));

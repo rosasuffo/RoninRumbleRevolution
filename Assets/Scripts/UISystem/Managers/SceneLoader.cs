@@ -13,6 +13,7 @@ namespace UISystem.Managers
         public enum Scene
         {
             MainMenu,
+            LobbyScene,
             LoadingScene,
             CharacterSelect,
             GameScene,

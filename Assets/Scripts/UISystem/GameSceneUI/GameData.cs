@@ -5,6 +5,7 @@ using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using UISystem.GameSceneUI;
 using UnityEngine.Video;
 
 public class GameData : NetworkBehaviour
@@ -60,7 +61,7 @@ public class GameData : NetworkBehaviour
             GameObject prefb = GameMultiplayer.Instance.GetCharacterPrefabFromPlayerDataIndex(playersData[i].clientId);
             FighterMovement fighterMov = prefb.GetComponent<FighterMovement>();
             fighterMovs.Add(fighterMov);
-            hp.Add($"{fighterMov.hp}");
+            hp.Add($"{fighterMov._publicLifebar}");
             
         }
 
@@ -80,7 +81,7 @@ public class GameData : NetworkBehaviour
         for (int i = 0; i < playersData.Count; i++)
         {
             Vector3 imagePos = new Vector3(x, 50, 0);
-            x = x + 580 / playersData.Count;
+            x += 580 / playersData.Count;
 
             // Character Image
             GameObject imageObj = new GameObject("Image");
@@ -133,7 +134,7 @@ public class GameData : NetworkBehaviour
     {
         for (int i = 0; i < playersData.Count; i++)
         {
-            hp[i] = $"{fighterMovs[i].hp}";
+            hp[i] = $"{fighterMovs[i]._publicLifebar}";
         }
     }
 }
