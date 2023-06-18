@@ -109,7 +109,7 @@ public class GameMultiplayer : NetworkBehaviour
             playerName = playersNamesNetworkList[(int)clientId],
             characterIdFromList = 0, //por defecto todos son el primero character
             playerLife = 100,
-            
+
         });
         Debug.Log($"{playerDataNetworkList.Count} on PlayersIds list: ");
         foreach (var playerData in playerDataNetworkList)

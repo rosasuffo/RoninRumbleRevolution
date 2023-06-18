@@ -18,6 +18,7 @@ public class GameRunningUI : MonoBehaviour
     private List<FighterMovement> fighterMovs;
     [SerializeField] private Font fmfont;
     public List<PlayerData> playersData;
+    public List<GameObject> playerHPs;
 
     public Sprite huntress;
     public Sprite akaikaze;
@@ -38,9 +39,16 @@ public class GameRunningUI : MonoBehaviour
         timer.text = string.Format("{00:00}:{01:00}", minutes, seconds);
         //timer.text = currentTime.ToString();
 
+    }
+    public void UpdateLife(ulong clientId, int playerLife)
+    {
         for (int i = 0; i < playersData.Count; i++)
         {
-            hp[i] = $"{fighterMovs[i]._publicLifebar}";
+            if (playersData[i].clientId == clientId)
+            {
+                Text playerHP = playerHPs[i].GetComponent<Text>();
+                playerHP.text = $"{playersData[i].playerLife}";
+            }
         }
     }
 
@@ -51,11 +59,12 @@ public class GameRunningUI : MonoBehaviour
         sprites = new List<Sprite>();
         names = new List<string>();
         hp = new List<string>();
+        fighterMovs = new List<FighterMovement>();
 
-        for (int i = 0; i < playersData.Count; i++)
+        foreach (PlayerData player in playersData)
         {
             Sprite sp;
-            switch (playersData[i].characterIdFromList)
+            switch (player.characterIdFromList)
             {
                 case 0:
                     sp = huntress;
@@ -68,11 +77,11 @@ public class GameRunningUI : MonoBehaviour
                     break;
             }
             sprites.Add(sp);
-            names.Add($"{playersData[i].playerName}");
-            GameObject prefb = GameMultiplayer.Instance.GetCharacterPrefabFromPlayerDataIndex(playersData[i].clientId);
+            names.Add($"{player.playerName}");
+            GameObject prefb = GameMultiplayer.Instance.GetCharacterPrefabFromPlayerDataIndex(player.clientId);
             FighterMovement fighterMov = prefb.GetComponent<FighterMovement>();
             fighterMovs.Add(fighterMov);
-            hp.Add($"{fighterMov._publicLifebar}");
+            hp.Add($"{player.playerLife}");
 
         }
 
@@ -80,6 +89,7 @@ public class GameRunningUI : MonoBehaviour
     public void ShowData()
     {
         Console.WriteLine("SHOWDATA");
+        playerHPs = new List<GameObject>();
 
         // Canvas
         info = new GameObject("GameInfo");
@@ -127,7 +137,7 @@ public class GameRunningUI : MonoBehaviour
             rectPN.sizeDelta = new Vector2(40, 22);
 
             // Player HP
-            GameObject playerHP = new GameObject("PlayerHP");
+            GameObject playerHP = new GameObject($"PlayerHP{i}");
             playerHP.transform.SetParent(canvas.transform, false);
 
             Text hps = playerHP.AddComponent<Text>();
@@ -135,6 +145,7 @@ public class GameRunningUI : MonoBehaviour
             hps.font = fmfont;
             hps.color = color;
             hps.fontSize = 20;
+            playerHPs.Add(playerHP);
 
             // Text position
             RectTransform rectHP = playerHP.GetComponent<RectTransform>();

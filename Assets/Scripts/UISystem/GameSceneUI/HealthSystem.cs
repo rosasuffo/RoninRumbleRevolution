@@ -14,12 +14,11 @@ namespace UISystem.GameSceneUI
     {
         public static HealthSystem Instance { get; private set; }
 
-        [SerializeField] private Slider _privateLifebar;
+        [SerializeField] private int hp;
 
         private void Start()
         {
             //_privateLifebar = gameObject.GetComponent<Slider>();
-            _privateLifebar.gameObject.SetActive(true);
             GameMultiplayer.Instance.OnPlayerDataListChanged += GameMultiplayer_OnPlayerDataListChanged;
             //OnPlayerUpdatePrivateLife += HealthSystem_OnPlayerUpdatePrivateLife;
             //GameManager.Instance.OnStartGame += GameManager_OnStartGame;
@@ -34,11 +33,11 @@ namespace UISystem.GameSceneUI
         {
             foreach (ulong id in NetworkManager.Singleton.ConnectedClientsIds)
             {
-                UpdateLifebarClientRpc(id);
+                UpdateLifeClientRpc(id);
             }
         }
 
-        public void UpdatePrivateLifebar(int playerLife)
+        public void UpdateLifebar(int playerLife)
         {
             Debug.Log("Damage");
             //PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFromClientId(clientId);
@@ -46,24 +45,24 @@ namespace UISystem.GameSceneUI
             //{
             //    Die();
             //}
-            _privateLifebar.value = playerLife;
+            hp = playerLife;
         }
 
         [ClientRpc]
-        private void UpdateLifebarClientRpc(ulong clientId)
+        private void UpdateLifeClientRpc(ulong clientId)
         {
             PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFromClientId(clientId);
-            _privateLifebar.value = playerData.playerLife;
+            hp = playerData.playerLife;
         }
 
 
-        [ClientRpc]
-        private void UpdateLifeClientRpc()
+       // [ClientRpc]
+        private void UpdateLifeClientsRpc()
         {
             foreach(ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
             {
                 PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFromClientId(clientId);
-                _privateLifebar.value = playerData.playerLife;
+                hp = playerData.playerLife;
             }
             
         }

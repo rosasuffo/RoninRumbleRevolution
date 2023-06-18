@@ -25,7 +25,7 @@ namespace Movement.Components
         private NetworkAnimator _networkAnimator;
         private Transform _feet;
         private LayerMask _floor;
-        public Slider _publicLifebar;
+        //public int _hp;
         //private Slider _privateLifebar;
 
         private Vector3 _direction = Vector3.zero;
@@ -56,7 +56,6 @@ namespace Movement.Components
             _animator = GetComponent<Animator>();
             _networkAnimator = GetComponent<NetworkAnimator>();
             //_privateLifebar = GetComponentInChildren<Canvas>(CompareTag("private")).GetComponentInChildren<Slider>();
-            _publicLifebar = GetComponentInChildren<Canvas>(CompareTag("public")).GetComponentInChildren<Slider>();
             
             //_privateLifebar = GetComponentInChildren<Canvas>().GetComponentInChildren<Slider>();
 
@@ -218,7 +217,7 @@ namespace Movement.Components
         {
             _networkAnimator.SetTrigger(AnimatorHit);
             //_lifebar.value -= 5;
-            UpdateLifebarClientRpc();
+            UpdateLifeClientRpc();
             //UpdatePrivateLifebar();
             //_privateLifebar.value = _publicLifebar.value;
 
@@ -236,14 +235,14 @@ namespace Movement.Components
         }
         
         [ClientRpc]
-        private void UpdateLifebarClientRpc()
+        private void UpdateLifeClientRpc()
         {
             PlayerData playerData = GameMultiplayer.Instance.GetPlayerDataFromClientId(OwnerClientId);
             //if(playerData.playerLife <= 0)
             //{
             //    Die();
             //}
-            _publicLifebar.value = playerData.playerLife;
+            //_publicLifebar.value = playerData.playerLife;
             //_privateLifebar.value = playerData.playerLife;
 
             //GameManager.Instance.UpdatePrivateLifebarClient(playerData.playerLife);

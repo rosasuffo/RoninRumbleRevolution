@@ -61,7 +61,7 @@ public class GameData : NetworkBehaviour
             GameObject prefb = GameMultiplayer.Instance.GetCharacterPrefabFromPlayerDataIndex(playersData[i].clientId);
             FighterMovement fighterMov = prefb.GetComponent<FighterMovement>();
             fighterMovs.Add(fighterMov);
-            hp.Add($"{fighterMov._publicLifebar}");
+            hp.Add($"{playersData[i].playerLife}");
             
         }
 
@@ -134,7 +134,7 @@ public class GameData : NetworkBehaviour
     {
         for (int i = 0; i < playersData.Count; i++)
         {
-            hp[i] = $"{fighterMovs[i]._publicLifebar}";
+            hp[i] = $"{playersData[i].playerLife}";
         }
     }
 }

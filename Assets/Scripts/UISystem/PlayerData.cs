@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 using Unity.Collections;
+using Movement.Components;
+using Unity.Services.Lobbies.Models;
 
 public struct PlayerData : IEquatable<PlayerData>, INetworkSerializable
 {
